@@ -4,6 +4,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
 public class SpriteMaker : MonoBehaviour {
+    public Texture2D src;
     SpriteRenderer rend;
 
     // Start is called before the first frame update
@@ -11,12 +12,16 @@ public class SpriteMaker : MonoBehaviour {
         rend = GetComponent<SpriteRenderer>();
 
         // create a texture
-        Texture2D tex = new Texture2D(8, 8);
+        Texture2D tex = new Texture2D(src.width, src.height);
         Color[] colorArray = new Color[tex.width * tex.height];
+
+        Color[] srcArray = src.GetPixels();
 
         for (int x = 0; x < tex.width; x++) {
             for (int y = 0; y < tex.height; y++) {
-                colorArray[x + y * tex.width] = Color.Lerp(Color.black, Color.white, (float)y / tex.width);
+                int pixelIndex = x + y * tex.width;
+                Color srcPixel = srcArray[pixelIndex];
+                colorArray[pixelIndex] = srcPixel;
             }
         }
         tex.SetPixels(colorArray);
