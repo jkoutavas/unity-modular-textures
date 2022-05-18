@@ -12,11 +12,14 @@ public class SpriteMaker : MonoBehaviour {
 
         // create a texture
         Texture2D tex = new Texture2D(8, 8);
+        Color[] colorArray = new Color[tex.width * tex.height];
+
         for (int x = 0; x < tex.width; x++) {
             for (int y = 0; y < tex.height; y++) {
-                tex.SetPixel(x, y, Color.red);
+                colorArray[x + y * tex.width] = Color.Lerp(Color.black, Color.white, (float)y / tex.width);
             }
         }
+        tex.SetPixels(colorArray);
         tex.Apply();
 
         // create a sprite from that texture
@@ -24,7 +27,8 @@ public class SpriteMaker : MonoBehaviour {
 
         // assign our procedural sprite to rend sprite
         rend.sprite = newSprite;
-
+        tex.wrapMode = TextureWrapMode.Clamp;
+        tex.filterMode = FilterMode.Point;
     }
 
     // Update is called once per frame
