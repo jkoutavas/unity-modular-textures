@@ -38,8 +38,10 @@ public class SpriteMaker : MonoBehaviour {
                 int pixelIndex = x + y * tex.width;
                 for (int i = 0; i < layers.Length; i++) {
                     Color srcPixel = srcArray[i][pixelIndex];
-                    if (srcPixel.a > 0) {
+                    if (srcPixel.a == 1) {
                         colorArray[pixelIndex] = srcPixel;
+                    } else if (srcPixel.a > 0) {
+                        colorArray[pixelIndex] = normalBlend(colorArray[pixelIndex], srcPixel);
                     }
                 }
             }
@@ -58,5 +60,13 @@ public class SpriteMaker : MonoBehaviour {
 
         //assign our procedural sprite to rend sprite
         rend.sprite = newSprite;
+    }
+
+    Color normalBlend(Color dest, Color src) {
+        float srcAlpha = src.a;
+        float destAlpha = (1 - srcAlpha) * dest.a;
+        Color destLayer = dest * destAlpha;
+        Color srcLayer = src * srcAlpha;
+        return destLayer + srcLayer;
     }
 }
