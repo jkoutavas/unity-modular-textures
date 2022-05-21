@@ -71,7 +71,14 @@ public class SpriteMaker : MonoBehaviour {
             }
         }
 
-        // iterate through each pixel, copying the source index to the destination index
+        //set each color layer to alpha 100% if it isn't already
+        for (int i = 0; i < layerColors.Length; i++) {
+            if (layerColors[i].a != 1) {
+                layerColors[i] = new Color(layerColors[i].r, layerColors[i].g, layerColors[i].b, 1f);
+            }
+        }
+
+        //iterate through each pixel, copying the source index to the destination index
         for (int x = 0; x < newTexture.width; x++) {
             for (int y = 0; y < newTexture.height; y++) {
                 int pixelIndex = x + y * newTexture.width;
@@ -79,8 +86,8 @@ public class SpriteMaker : MonoBehaviour {
                     Color srcPixel = adjustedLayers[i][pixelIndex];
 
                     //APPLY LAYER COLOR IF NECESSARY
-                    if (srcPixel.r != 0 && srcPixel.a != 0) {
-                        srcPixel = layerColors[i];
+                    if (srcPixel.r != 0 && srcPixel.a != 0 && i < layerColors.Length) {
+                        srcPixel = applyColorToPixel(srcPixel, layerColors[i]);
                     }
 
                     //NORMAL BLENDING BASED ON ALPHA
@@ -115,6 +122,13 @@ public class SpriteMaker : MonoBehaviour {
         Color destLayer = dest * destAlpha;
         Color srcLayer = src * srcAlpha;
         return destLayer + srcLayer;
+    }
+
+    Color applyColorToPixel(Color pixel, Color applyColor) {
+        if (pixel.r == 1f) {
+            return applyColor;
+        }
+        return pixel * applyColor;
     }
 
     Texture2D clearTexture(int width, int height) {
