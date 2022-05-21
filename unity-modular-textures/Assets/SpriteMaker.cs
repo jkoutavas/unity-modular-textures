@@ -4,13 +4,12 @@ using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
 public class SpriteMaker : MonoBehaviour {
-
     SpriteRenderer rend;
+
+    Texture2D tex;
 
     public Texture2D[] TextureArray;
     public Color[] ColorArray;
-
-    Texture2D tex;
 
     // Use this for initialization
     void Start() {
@@ -40,11 +39,36 @@ public class SpriteMaker : MonoBehaviour {
         Color[] colorArray = new Color[newTexture.width * newTexture.height];
 
         //array of colors derived from the source Texture
-        Color[][] srcArray = new Color[layers.Length][];
+        Color[][] adjustedLayers = new Color[layers.Length][];
 
-        //populate source array with layer arrays
+        //populate array with cropped or expanded layer arrays
         for (int i = 0; i < layers.Length; i++) {
-            srcArray[i] = layers[i].GetPixels();
+            if (i == 0 || layers[i].width == newTexture.width && layers[i].height == newTexture.height) {
+                adjustedLayers[i] = layers[i].GetPixels();
+            } else {
+                int getX, getWidth, setX, setWidth;
+
+                getX = layers[i].width > newTexture.width ? (layers[i].width - newTexture.width) / 2 : 0;
+                getWidth = layers[i].width > newTexture.width ? newTexture.width : layers[i].width;
+                setX = layers[i].width < newTexture.width ? (newTexture.width - layers[i].width) / 2 : 0;
+                setWidth = layers[i].width < newTexture.width ? layers[i].width : newTexture.width;
+
+                int getY, getHeight, setY, setHeight;
+
+                getY = layers[i].height > newTexture.height ? (layers[i].height - newTexture.height) / 2 : 0;
+                getHeight = layers[i].height > newTexture.height ? newTexture.height : layers[i].height;
+                setY = layers[i].height < newTexture.height ? (newTexture.height - layers[i].height) / 2 : 0;
+                setHeight = layers[i].height < newTexture.height ? layers[i].height : newTexture.height;
+
+                Color[] getPixels = layers[i].GetPixels(getX, getY, getWidth, getHeight);
+                if (layers[i].width >= newTexture.width && layers[i].height >= newTexture.height) {
+                    adjustedLayers[i] = getPixels;
+                } else {
+                    Texture2D sizedLayer = clearTexture(newTexture.width, newTexture.height);
+                    sizedLayer.SetPixels(setX, setY, setWidth, setHeight, getPixels);
+                    adjustedLayers[i] = sizedLayer.GetPixels();
+                }
+            }
         }
 
         // iterate through each pixel, copying the source index to the destination index
@@ -52,11 +76,11 @@ public class SpriteMaker : MonoBehaviour {
             for (int y = 0; y < newTexture.height; y++) {
                 int pixelIndex = x + y * newTexture.width;
                 for (int i = 0; i < layers.Length; i++) {
-                    Color srcPixel = srcArray[i][pixelIndex];
+                    Color srcPixel = adjustedLayers[i][pixelIndex];
 
                     //APPLY LAYER COLOR IF NECESSARY
                     if (srcPixel.r != 0 && srcPixel.a != 0) {
-                        srcPixel = applyColorToPixel(srcPixel, layerColors[i]);
+                        srcPixel = layerColors[i];
                     }
 
                     //NORMAL BLENDING BASED ON ALPHA
@@ -93,10 +117,10 @@ public class SpriteMaker : MonoBehaviour {
         return destLayer + srcLayer;
     }
 
-    Color applyColorToPixel(Color pixel, Color applyColor) {
-        if (pixel.r == 1f) {
-            return applyColor;
-        }
-        return pixel * applyColor;
+    Texture2D clearTexture(int width, int height) {
+        Texture2D clearTexture = new Texture2D(width, height);
+        Color[] clearPixels = new Color[width * height];
+        clearTexture.SetPixels(clearPixels);
+        return clearTexture;
     }
 }
