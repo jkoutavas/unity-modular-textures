@@ -154,9 +154,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   layers:
-  - {fileID: 2800000, guid: c5f4c74694ef342ca87d9abc58e920e0, type: 3}
-  - {fileID: 2800000, guid: 5f80873a53a414201b2c6b1fc0fa5d8f, type: 3}
-  - {fileID: 2800000, guid: 70fe2fa914ab0415a99d0c17ad2321f2, type: 3}
+  - {fileID: 2800000, guid: 0c70ef3ce07ae4f4499a9a9d3ca8d14f, type: 3}
+  - {fileID: 2800000, guid: d200f6e3b4baa41a7a724e6fbce631d1, type: 3}
+  - {fileID: 2800000, guid: 43d5293a087974d93ab76e9ed83db680, type: 3}
+  layerColors:
+  - {r: 0.04045032, g: 0.9528302, b: 0.09440822, a: 1}
+  - {r: 0.14640439, g: 0.8002098, b: 0.8867924, a: 1}
+  - {r: 0.3962264, g: 0.39276418, b: 0.18503025, a: 1}
 --- !u!212 &105754016
 SpriteRenderer:
   m_ObjectHideFlags: 0
