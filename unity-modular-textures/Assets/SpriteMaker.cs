@@ -7,29 +7,37 @@ public class SpriteMaker : MonoBehaviour {
 
     SpriteRenderer rend;
 
-    public Texture2D[] layers;
-    public Color[] layerColors;
+    public Texture2D[] TextureArray;
+    public Color[] ColorArray;
 
     Texture2D tex;
-
 
     // Use this for initialization
     void Start() {
         rend = GetComponent<SpriteRenderer>();
 
         //making a texture
-        makeTexture();
+        tex = MakeTexture(TextureArray, ColorArray);
 
-        //making a sprite from that texture
-        makeSprite();
+        //assign our procedural sprite to rend sprite
+        rend.sprite = MakeSprite(tex);
     }
 
-    void makeTexture() {
+    public Texture2D MakeTexture(Texture2D[] layers, Color[] layerColors) {
+        //BUG CHECK: If only one or no image layers present
+        if (layers.Length == 0) {
+            Debug.LogError("No image layer information in array");
+            return Texture2D.whiteTexture;
+        } else if (layers.Length == 1) {
+            Debug.Log("Only one image layer present. Are you sure you need to make a texture?");
+            return layers[0];
+        }
+
         //create a texture
-        tex = new Texture2D(layers[0].width, layers[0].height);
+        Texture2D newTexture = new Texture2D(layers[0].width, layers[0].height);
 
         //array to store the destination texture's pixels
-        Color[] colorArray = new Color[tex.width * tex.height];
+        Color[] colorArray = new Color[newTexture.width * newTexture.height];
 
         //array of colors derived from the source Texture
         Color[][] srcArray = new Color[layers.Length][];
@@ -40,9 +48,9 @@ public class SpriteMaker : MonoBehaviour {
         }
 
         // iterate through each pixel, copying the source index to the destination index
-        for (int x = 0; x < tex.width; x++) {
-            for (int y = 0; y < tex.height; y++) {
-                int pixelIndex = x + y * tex.width;
+        for (int x = 0; x < newTexture.width; x++) {
+            for (int y = 0; y < newTexture.height; y++) {
+                int pixelIndex = x + y * newTexture.width;
                 for (int i = 0; i < layers.Length; i++) {
                     Color srcPixel = srcArray[i][pixelIndex];
 
@@ -62,20 +70,19 @@ public class SpriteMaker : MonoBehaviour {
         }
 
         //transfer the array to the texture and apply the pixels
-        tex.SetPixels(colorArray);
-        tex.Apply();
+        newTexture.SetPixels(colorArray);
+        newTexture.Apply();
 
         //confirm any settings
-        tex.wrapMode = TextureWrapMode.Clamp;
-        //    tex.filterMode = FilterMode.Point;
+        newTexture.wrapMode = TextureWrapMode.Clamp;
+        //newTexture.filterMode = FilterMode.Point;
+
+        return newTexture;
     }
 
-    void makeSprite() {
+    public Sprite MakeSprite(Texture2D texture) {
         //create a sprite from that texture
-        Sprite newSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.one * 0.5f);
-
-        //assign our procedural sprite to rend sprite
-        rend.sprite = newSprite;
+        return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
     }
 
     Color normalBlend(Color dest, Color src) {
