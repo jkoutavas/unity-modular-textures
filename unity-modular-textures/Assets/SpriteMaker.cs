@@ -24,6 +24,15 @@ public class SpriteMaker : MonoBehaviour {
     }
 
     public Texture2D MakeTexture(Texture2D[] layers, Color[] layerColors) {
+        //BUG CHECK: If only one or no image layers present
+        if (layers.Length == 0) {
+            Debug.LogError("No image layer information in array");
+            return Texture2D.whiteTexture;
+        } else if (layers.Length == 1) {
+            Debug.Log("Only one image layer present. Are you sure you need to make a texture?");
+            return layers[0];
+        }
+
         //create a texture
         Texture2D newTexture = new Texture2D(layers[0].width, layers[0].height);
 
